@@ -3,7 +3,9 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 namespace AvadaKedavrav2
 {
@@ -18,14 +20,13 @@ namespace AvadaKedavrav2
 
         [WriteOnly] public NativeArray<AvadaKedavdaElement> rwData;
         [ReadOnly] public ComponentLookup<LocalToWorld> ltwRo;
+        [ReadOnly] public ComponentLookup<LocalTransform> transformRo;
         [ReadOnly] public ComponentLookup<AvadaKedavraData> avadaRo;
         [ReadOnly] public EntityStorageInfoLookup entityStorageInfoLookup;
 
         [BurstCompile]
         public void Execute()
         {
-            #region Update
-
             for (int i = aliveEffects.Length - 1; i >= 0; i--)
             {
                 var element = aliveEffects[i];
@@ -66,11 +67,20 @@ namespace AvadaKedavrav2
 
                 if (root.avadaSyncType == 0) continue;
                 var current = new AvadaKedavdaElement();
+                bool update = false;
                 if ((root.avadaSyncType & AvadaSyncType.LocalToWorld) != 0 && ltwRo.TryGetComponent(element.bind, out var ltw))
                 {
                     // elementBufferData.from = ltw.Position + math.rotate(ltw.Rotation, element.origin.bindOffset);
                     current.from = ltw.Position;
                     current.direction = ltw.Forward;
+                    update = true;
+                }
+
+                if ((root.avadaSyncType & AvadaSyncType.LocalTransform) != 0 && transformRo.TryGetComponent(element.bind, out var t))
+                {
+                    current.from = t.Position;
+                    current.direction = t.Forward();
+                    update = true;
                 }
 
                 // if ((element.syncType & SyncType.AvadaKedavraOnlyExtra) != 0 && avadaRo.TryGetComponent(element.bind, out var avada))
@@ -88,12 +98,13 @@ namespace AvadaKedavrav2
                     current.to = avada.value.to;
                     current.scale = avada.value.scale;
                     current.extra = avada.value.extra;
+                    update = true;
                 }
 
-                rwData[element.bufferId] = current;
+                if (update)
+                    rwData[element.bufferId] = current;
+               
             }
-
-            #endregion
         }
     }
 }

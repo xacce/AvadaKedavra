@@ -30,7 +30,7 @@ namespace AvadaKedavrav2
 
             while (requests.TryDequeue(out var request))
             {
-                if (!request.bind.Equals(Entity.Null))
+                if (request.bind.Equals(Entity.Null))
                 {
 #if AVADA_ENABLE_LOG_ERRORS
                     Debug.LogError($"[Avada] Cant use {request.id} vfx, because it requires bind");

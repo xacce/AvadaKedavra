@@ -36,16 +36,15 @@ namespace AvadaKedavra2.Runtime
             _requests.Enqueue(request);
         }
 
-        public void Load(AvadaKedavraRequest request)
+        protected void Load(AvadaKedavraV2EffectSo _rootManaged)
         {
             isLoaded = true;
-
-            _rootManaged = request.vfx.Value;
+            this._rootManaged = _rootManaged;
             _rootUnmanaged = _rootManaged.AsUnmanaged();
             // var root = asset.vfx;
             var spawned = new GameObject($"AvadaKedavra");
             var ve = spawned.AddComponent<VisualEffect>();
-            id = _rootManaged.id;
+            id = _rootManaged.avadaId;
 
             ve.visualEffectAsset = _rootManaged.vfx;
             _effect = ve;
@@ -106,7 +105,7 @@ namespace AvadaKedavra2.Runtime
 
         public abstract bool HasState();
         public abstract void DrawDebug(StringBuilder str);
-        public abstract void DoLoad(AvadaKedavraRequest request);
+        public abstract void DoLoad(AvadaKedavraV2EffectSo request);
 
         public bool Equals(AvadaKedavraBaseVfxController other)
         {

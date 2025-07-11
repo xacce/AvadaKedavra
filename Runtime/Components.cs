@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using AvadaKedavrav2.So;
+using Core.Hybrid;
 using DotsCore.Keke;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -11,8 +12,12 @@ using UnityEngine;
 
 namespace AvadaKedavrav2
 {
+    [Serializable]
     public struct AvadaKedavraVfxId : IEquatable<AvadaKedavraVfxId>
     {
+#if UNITY_EDITOR
+        [IdSelector(typeof(AvadaKedavraV2EffectSo))]
+#endif
         public int id;
 
         public AvadaKedavraVfxId(int id)
@@ -98,13 +103,13 @@ namespace AvadaKedavrav2
         public Entity bind;
         public UnsafeList<AvadaKedavraStripId> reservedStrips;
     }
-    
+
     internal struct AvadaAliveOneShootStrips
     {
         public double invalidateAt;
         public UnsafeList<AvadaKedavraStripId> reservedStrips;
     }
-    
+
     internal struct AvadaAliveBuffered
     {
         public int bufferId;
@@ -112,17 +117,43 @@ namespace AvadaKedavrav2
     }
 
 
-
-
     public partial struct AvadaKedavraData : IComponentData
     {
         public AvadaKedavdaElement value;
     }
 
+    [Serializable]
+    public partial struct AvadaKedavra2BakedRequest
+    {
+        public AvadaKedavraVfxId id;
+
+        public float lifetime;
+
+        public bool isValid => id.id != 0;
+
+        // void kek()=>vfx.Value.GetInstanceID()
+        public AvadaKedavraRequest AsRequest() => new AvadaKedavraRequest()
+        {
+            id = id,
+            lifetime = lifetime,
+            hot = 1
+        };
+    }
+
+    public partial struct AvadaPreloadVfx : IComponentData
+    {
+        public UnityObjectRef<AvadaKedavraV2EffectSo> vfx;
+
+        public AvadaKedavraRequest AsRequest() => new AvadaKedavraRequest()
+        {
+            vfx = vfx,
+        };
+    }
 
     [InternalBufferCapacity(0)]
     public partial struct AvadaKedavraRequest : IBufferElementData
     {
+        public byte hot;
         public Vector3 from;
         public Vector3 to;
         public Vector3 direction;
@@ -132,7 +163,7 @@ namespace AvadaKedavrav2
         public AvadaKedavraVfxId id;
         public Entity bind;
         public float lifetime;
-        // void kek()=>vfx.Value.GetInstanceID()
+        public bool isValid => id.id != 0;
 
         public void SetLifetime(float lifetime)
         {
@@ -154,6 +185,11 @@ namespace AvadaKedavrav2
             this.scale = scale;
         }
 
+        public void Scale(float scale)
+        {
+            this.scale = new Vector3(scale, scale, scale);
+        }
+
         public void Direction(Vector3 direction)
         {
             this.direction = direction;
@@ -173,6 +209,12 @@ namespace AvadaKedavrav2
         public static void Send(EntityCommandBuffer ecb, Entity avadaEntity, AvadaKedavraRequest request)
         {
             ecb.AppendToBuffer(avadaEntity, request);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Send(int index, EntityCommandBuffer.ParallelWriter ecb, Entity avadaEntity, AvadaKedavraRequest request)
+        {
+            ecb.AppendToBuffer(index, avadaEntity, request);
         }
     }
 
@@ -208,6 +250,7 @@ namespace AvadaKedavrav2
     {
         LocalToWorld = 1 << 0,
         AvadaKedavraAll = 1 << 1,
+        LocalTransform = 1 << 2,
         // AvadaKedavraOnlyExtra = 1 << 1,
     }
 }

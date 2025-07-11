@@ -7,8 +7,10 @@
     "Unity.Collections",
     "Unity.Mathematics",
     "Unity.Burst",
+    "Unity.Scenes",
     "Unity.Transforms",
-    "Unity.VisualEffectGraph.Runtime"
+    "Unity.VisualEffectGraph.Runtime",
+    "com.xacce.core.hybrid"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

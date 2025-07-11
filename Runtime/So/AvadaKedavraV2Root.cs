@@ -1,11 +1,12 @@
 ﻿using System;
+using Core.Hybrid;
 using UnityEngine;
 using UnityEngine.VFX;
 
 namespace AvadaKedavrav2.So
 {
     [CreateAssetMenu(menuName = "AvadaKedavra/New effect")]
-    public class AvadaKedavraV2EffectSo : ScriptableObject
+    public class AvadaKedavraV2EffectSo : ScriptableObject, IUniqueIdProvider
     {
         [SerializeField] private VisualEffectAsset vfx_s;
         [SerializeField] private int initialBufferCapacity_s;
@@ -22,13 +23,14 @@ namespace AvadaKedavrav2.So
 
         public float baseLifetime => baseLifetime_s;
 
-        public AvadaKedavraVfxId id => new AvadaKedavraVfxId(id_s);
+        public AvadaKedavraVfxId avadaId => new AvadaKedavraVfxId(id_s);
+        public int id => id_s;
 
         public AvadaKedavraRequest AsColdRequest()
         {
             return new AvadaKedavraRequest()
             {
-                id = id,
+                id = avadaId,
                 vfx = this,
                 lifetime = baseLifetime,
             };
@@ -38,16 +40,17 @@ namespace AvadaKedavrav2.So
         {
             return new AvadaKedavraRequest()
             {
-                id = id,
+                id = avadaId,
                 lifetime = baseLifetime,
+                hot = 1,
             };
         }
 
-        public AvadaKedavraRequest AsHotBlobRequest()
+        public AvadaKedavra2BakedRequest AsHotBlobRequest()
         {
-            return new AvadaKedavraRequest()
+            return new AvadaKedavra2BakedRequest()
             {
-                id = id,
+                id = avadaId,
                 lifetime = baseLifetime,
             };
         }
@@ -74,6 +77,5 @@ namespace AvadaKedavrav2.So
 
 
         public VisualEffectAsset vfx => vfx_s;
-
     }
 }

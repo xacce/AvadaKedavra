@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using AvadaKedavra2.Runtime;
+using AvadaKedavrav2.So;
 using DotsCore.Keke;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -11,7 +12,7 @@ namespace AvadaKedavrav2
 {
     public class AvadaKedavraOneShootVfxController : AvadaKedavraBaseVfxController
     {
-        public override void DoLoad(AvadaKedavraRequest request)
+        public override void DoLoad(AvadaKedavraV2EffectSo request)
         {
             if (isLoaded || isLoading) return;
             Load(request);
@@ -49,8 +50,8 @@ namespace AvadaKedavrav2
 
         public override void DrawDebug(StringBuilder str)
         {
-            str.AppendLine($"[{_rootManaged.id.id}] Queued emitters: {_plannedEmitters.Length}");
-            str.AppendLine($"[{_rootManaged.id.id}] Alive GPU: {_effect.aliveParticleCount}");
+            str.AppendLine($"[{_rootManaged.avadaId.id}] Queued emitters: {_plannedEmitters.Length}");
+            str.AppendLine($"[{_rootManaged.avadaId.id}] Alive GPU: {_effect.aliveParticleCount}");
         }
 
         public override bool CanDeactivated()

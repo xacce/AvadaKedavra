@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using AvadaKedavra2.Runtime;
+using AvadaKedavrav2.So;
 using DotsCore.Keke;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -17,7 +18,7 @@ namespace AvadaKedavrav2
 
         private NativeList<AvadaAliveBuffered> _alive;
 
-        public override void DoLoad(AvadaKedavraRequest request)
+        public override void DoLoad(AvadaKedavraV2EffectSo request)
         {
             if (isLoaded || isLoading) return;
             Load(request);
@@ -36,7 +37,6 @@ namespace AvadaKedavrav2
 
                 i++;
             }
-
             _buffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, GraphicsBuffer.UsageFlags.LockBufferForWrite, _rootManaged.initialBufferCapacity,
                 UnsafeUtility.SizeOf<AvadaKedavdaElement>());
             for (i = 0; i < _rootManaged.initialBufferCapacity; i++)
@@ -100,6 +100,7 @@ namespace AvadaKedavrav2
                 ltwRo = lookups.ltwRo,
                 avadaRo = lookups.avadaRo,
                 entityStorageInfoLookup = lookups.entityStorageInfoLookup,
+                transformRo = lookups.transformRo,
             }.Schedule(dependency);
         }
 
@@ -117,10 +118,10 @@ namespace AvadaKedavrav2
 
         public override void DrawDebug(StringBuilder str)
         {
-            str.AppendLine($"[{_rootManaged.id.id}] Queued emitters: {_plannedEmitters.Length}");
-            str.AppendLine($"[{_rootManaged.id.id}] Alive CPU/GPU: {_alive.Length}/{_effect.aliveParticleCount}");
-            str.AppendLine($"[{_rootManaged.id.id}] Pool size: {_pool.Count}");
-            str.AppendLine($"[{_rootManaged.id.id}] Grow length: {_growBuffer.Count}");
+            str.AppendLine($"[{_rootManaged.avadaId.id}] Queued emitters: {_plannedEmitters.Length}");
+            str.AppendLine($"[{_rootManaged.avadaId.id}] Alive CPU/GPU: {_alive.Length}/{_effect.aliveParticleCount}");
+            str.AppendLine($"[{_rootManaged.avadaId.id}] Pool size: {_pool.Count}");
+            str.AppendLine($"[{_rootManaged.avadaId.id}] Grow length: {_growBuffer.Count}");
 
         }
 

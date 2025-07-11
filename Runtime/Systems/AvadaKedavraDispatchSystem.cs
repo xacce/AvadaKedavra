@@ -61,6 +61,30 @@ namespace AvadaKedavrav2
             }
         }
 
+        private AvadaKedavraBaseVfxController Load(AvadaKedavraRequest request)
+        {
+            var data = request.vfx.Value;
+            AvadaKedavraBaseVfxController c;
+            switch (data.avadaEffectType)
+            {
+                case AvadaEffectType.BufferedWithStrips:
+                    c = new AvadaKedavraBufferedWithStripsVfxController();
+                    break;
+                case AvadaEffectType.Buffered:
+                    c = new AvadaKedavraBufferedVfxController();
+                    break;
+                case AvadaEffectType.OneShootWithStrips:
+                    c = new AvadaKedavraOneShootStripsVfxController();
+                    break;
+                default:
+                case AvadaEffectType.OneHoot:
+                    c = new AvadaKedavraOneShootVfxController();
+                    break;
+            }
+            c.DoLoad(request.vfx.Value);
+            return c;
+        }
+
         protected override void OnUpdate()
         {
             _lookups.Update(this);
@@ -70,32 +94,43 @@ namespace AvadaKedavrav2
             {
                 var request = requests[i];
                 AvadaKedavraBaseVfxController vfxController;
+                if (request.id.id == 0)
+                {
+                    if (request.vfx.IsValid())
+                    {
+                        var vfxId = request.vfx.Value.avadaId;
+                        if (!_roots.TryGetValue(vfxId, out vfxController))
+                        {
+                            Debug.Log($"[Avada] Receive preload request for effect id: {vfxId}, try to load");
+                            var ctrl = Load(request);
+                            _roots[ctrl.id] = ctrl;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("[Avada] Receive preload request for effect id: 0, but effect link is not valid");
+                    }
+
+                    requests.RemoveAt(i);
+                    i--;
+                    continue;
+                }
+
                 if (!_active.TryGetValue(request.id, out vfxController))
                 {
                     Debug.Log($"[Avada] Effect id: {request.id} currently not active, try to activate");
                     if (!_roots.TryGetValue(request.id, out vfxController))
                     {
-                        Debug.Log($"[Avada] Effect id: {request.id} currently not loaded, try to load, effect was skipped");
-                        var data = request.vfx.Value;
-                        switch (data.avadaEffectType)
+                        if (request.hot == 1)
                         {
-                            case AvadaEffectType.BufferedWithStrips:
-                                vfxController = new AvadaKedavraBufferedWithStripsVfxController();
-                                break;
-                            case AvadaEffectType.Buffered:
-                                vfxController = new AvadaKedavraBufferedVfxController();
-                                break;
-                            case AvadaEffectType.OneShootWithStrips:
-                                vfxController = new AvadaKedavraOneShootStripsVfxController();
-                                break;
-                            default:
-                            case AvadaEffectType.OneHoot:
-                                vfxController = new AvadaKedavraOneShootVfxController();
-                                break;
+                            Debug.LogError($"[Avada] Effect id: {request.id} currently not loaded, and request marked as hot, skipped and not loaded, use preload for hot effects");
+                            continue;
                         }
 
-                        vfxController.DoLoad(request);
-                        _roots[request.id] = vfxController;
+                        Debug.Log($"[Avada] Effect id: {request.id} currently not loaded, try to load, effect was skipped");
+
+
+                        _roots[request.id] = Load(request);
                         continue;
                     }
                     else
@@ -183,12 +218,14 @@ namespace AvadaKedavrav2
             [ReadOnly] public EntityStorageInfoLookup entityStorageInfoLookup;
             [ReadOnly] public ComponentLookup<AvadaKedavraData> avadaRo;
             [ReadOnly] public ComponentLookup<LocalToWorld> ltwRo;
+            [ReadOnly] public ComponentLookup<LocalTransform> transformRo;
 
             public Lookups(SystemBase state) : this()
             {
                 entityStorageInfoLookup = state.GetEntityStorageInfoLookup();
                 avadaRo = state.GetComponentLookup<AvadaKedavraData>(true);
                 ltwRo = state.GetComponentLookup<LocalToWorld>(true);
+                transformRo = state.GetComponentLookup<LocalTransform>(true);
             }
 
             public void Update(SystemBase state)
@@ -196,6 +233,7 @@ namespace AvadaKedavrav2
                 entityStorageInfoLookup.Update(state);
                 avadaRo.Update(state);
                 ltwRo.Update(state);
+                transformRo.Update(state);
             }
         }
     }
