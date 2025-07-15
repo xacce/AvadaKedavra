@@ -93,6 +93,7 @@ namespace AvadaKedavrav2
                 // }
                 if ((root.avadaSyncType & AvadaSyncType.AvadaKedavraAll) != 0 && avadaRo.TryGetComponent(element.bind, out var avada))
                 {
+                    
                     current.direction = avada.value.direction;
                     current.from = avada.value.from;
                     current.to = avada.value.to;
@@ -100,7 +101,6 @@ namespace AvadaKedavrav2
                     current.extra = avada.value.extra;
                     update = true;
                 }
-
                 if (update)
                     rwData[element.bufferId] = current;
                
