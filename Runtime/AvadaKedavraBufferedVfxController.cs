@@ -37,11 +37,17 @@ namespace AvadaKedavrav2
 
                 i++;
             }
+
             _buffer = new GraphicsBuffer(GraphicsBuffer.Target.Structured, GraphicsBuffer.UsageFlags.LockBufferForWrite, _rootManaged.initialBufferCapacity,
                 UnsafeUtility.SizeOf<AvadaKedavdaElement>());
             for (i = 0; i < _rootManaged.initialBufferCapacity; i++)
             {
                 _pool.Enqueue(i);
+            }
+
+            if (!_effect.HasGraphicsBuffer("avadaKedavra"))
+            {
+                Debug.LogError($"[Avada] No buffer found for {id}");
             }
 
             _effect.SetGraphicsBuffer("avadaKedavra", _buffer);
@@ -122,7 +128,6 @@ namespace AvadaKedavrav2
             str.AppendLine($"[{_rootManaged.avadaId.id}] Alive CPU/GPU: {_alive.Length}/{_effect.aliveParticleCount}");
             str.AppendLine($"[{_rootManaged.avadaId.id}] Pool size: {_pool.Count}");
             str.AppendLine($"[{_rootManaged.avadaId.id}] Grow length: {_growBuffer.Count}");
-
         }
 
         public override bool CanDeactivated()
@@ -143,7 +148,6 @@ namespace AvadaKedavrav2
             {
                 _alive.Dispose();
             }
-           
         }
     }
 }
