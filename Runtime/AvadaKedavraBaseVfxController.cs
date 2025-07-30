@@ -42,7 +42,7 @@ namespace AvadaKedavra2.Runtime
             this._rootManaged = _rootManaged;
             _rootUnmanaged = _rootManaged.AsUnmanaged();
             // var root = asset.vfx;
-            var spawned = new GameObject($"AvadaKedavra");
+            var spawned = new GameObject($"[{_rootManaged.id}] AvadaKedavra {_rootManaged.name}");
             var ve = spawned.AddComponent<VisualEffect>();
             id = _rootManaged.avadaId;
 

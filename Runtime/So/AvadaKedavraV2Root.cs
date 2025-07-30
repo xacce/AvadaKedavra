@@ -16,7 +16,7 @@ namespace AvadaKedavrav2.So
         [SerializeField] private AvadaKedavraManagedEmitter[] emitters_s = Array.Empty<AvadaKedavraManagedEmitter>();
         [SerializeField] private AvadaEffectType avadaEffectType_s;
         [SerializeField] private AvadaSyncType avadaSyncType_s;
-        [SerializeField] private int id_s;
+        [PickId(typeof(AvadaKedavraV2EffectSo))][SerializeField] private int id_s;
         [SerializeField] private float baseLifetime_s;
 
         public int hardCapPerFrameCapacityGrowLimit => hardCapPerFrameCapacityGrowLimit_s;
