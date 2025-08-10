@@ -25,6 +25,12 @@ namespace AvadaKedavrav2
             this.id = id;
         }
 
+        public AvadaKedavraRequest AsHotRequest() => new AvadaKedavraRequest()
+        {
+            id = this,
+            hot = 1,
+        };
+
         public bool Equals(AvadaKedavraVfxId other)
         {
             return id == other.id;
